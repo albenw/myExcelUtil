@@ -9,7 +9,6 @@ import com.albenw.excel.exception.ErrorCode;
 import com.albenw.excel.exception.ExcelException;
 import com.albenw.excel.util.AnnotationUtil;
 import com.albenw.excel.util.CollectionUtil;
-import com.albenw.excel.util.PoiUtil;
 import com.albenw.excel.util.ReflectionUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -122,14 +121,14 @@ public class XlsxSaxReadHandler implements XSSFSheetXMLHandler.SheetContentsHand
             for(int i = 0; i < fields.size(); i ++) {
                 Field field = fields.get(i).getField();
                 String formattedValue = cellString.get(i);
-                ImportField importColumn = AnnotationUtil.getImportColumn(field);
+                ImportField importColumn = AnnotationUtil.getImportField(field);
                 CellConverter cellConverter = ConverterHelper.getCellConverter(importColumn.converter());
                 Object value = null;
                 if(ConverterHelper.isDefaultCellConverter(cellConverter)){
                     value = ReflectionUtil.convertToTypeValueFromString(field.getType(), formattedValue);
                     ReflectionUtil.setFieldValue(field, instance, value);
                 } else {
-                    value = ConverterHelper.getTypeValue(cellConverter, formattedValue);
+                    value = ConverterHelper.getConvertInTypeValue(cellConverter, formattedValue);
                     Object convertedValue = cellConverter.convertIn(value);
                     ReflectionUtil.setFieldValue(field, instance, convertedValue);
                 }

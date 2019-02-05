@@ -4,7 +4,6 @@ import com.albenw.excel.annotation.ImportField;
 import com.albenw.excel.exception.ErrorCode;
 import com.albenw.excel.exception.ExcelException;
 import com.albenw.excel.util.AnnotationUtil;
-import com.albenw.excel.util.DateUtil;
 import com.albenw.excel.util.PoiUtil;
 import com.albenw.excel.base.IndexingField;
 import com.albenw.excel.base.context.ReaderContext;
@@ -12,15 +11,12 @@ import com.albenw.excel.base.converter.CellConverter;
 import com.albenw.excel.base.converter.ConverterHelper;
 import com.albenw.excel.base.listener.ReadEventListener;
 import com.albenw.excel.util.CollectionUtil;
-import com.albenw.excel.util.ReflectionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,7 +59,7 @@ public class DomReadParser extends AbstractReadParser {
                     continue;
                 }
                 Field field = fields.get(j).getField();
-                ImportField importColumn = AnnotationUtil.getImportColumn(field);
+                ImportField importColumn = AnnotationUtil.getImportField(field);
                 try {
                     //进行转换
                     CellConverter cellConverter = ConverterHelper.getCellConverter(importColumn.converter());
@@ -71,7 +67,7 @@ public class DomReadParser extends AbstractReadParser {
                         PoiUtil.transformToField(instance, field, cell);
                     } else {
                         String cellStringValue = PoiUtil.getCellStringValue(cell);
-                        Object value = ConverterHelper.getTypeValue(cellConverter, cellStringValue);
+                        Object value = ConverterHelper.getConvertInTypeValue(cellConverter, cellStringValue);
                         Object convertedValue = cellConverter.convertIn(value);
                         PoiUtil.setFieldValue(instance, field, convertedValue);
                     }

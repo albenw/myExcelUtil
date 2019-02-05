@@ -31,7 +31,7 @@ public class CollectionUtil {
         List<IndexingField> fields = new ArrayList<IndexingField>();
         List<IndexingField> annoNullFields = new ArrayList<IndexingField>();
         for (Field field : fieldsArr) {
-            ImportField ec = AnnotationUtil.getImportColumn(field);
+            ImportField ec = AnnotationUtil.getImportField(field);
             if (ec == null) {
                 continue;
             }
@@ -54,7 +54,7 @@ public class CollectionUtil {
         List<IndexingField> fields = new ArrayList<>();
         List<IndexingField> annoNullFields = new ArrayList<>();
         for (Field field : fieldsArr) {
-            ExportField ec = AnnotationUtil.getExportColumn(field);
+            ExportField ec = AnnotationUtil.getExportField(field);
             if (ec == null) {
                 continue;
             }

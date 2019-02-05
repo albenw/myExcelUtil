@@ -29,7 +29,7 @@ public class ConverterHelper {
         return cellConverter;
     }
 
-    public static Object getTypeValue(CellConverter cellConverter, String cellStringValue) throws ExcelException, ParseException {
+    public static Object getConvertInTypeValue(CellConverter cellConverter, String cellStringValue) throws ExcelException, ParseException {
         Type type = getConvertInParameterGenericType(cellConverter);
         if(type == null){
             throw new ExcelException(ErrorCode.FIELD_PARSE_ERROR, String.format("converter=[%s]获取泛型失败", cellConverter.getClass().getName()));
@@ -37,9 +37,14 @@ public class ConverterHelper {
         return ReflectionUtil.convertToTypeValueFromString(type, cellStringValue);
     }
 
-    private static Type getConvertInParameterGenericType(CellConverter cellConverter){
+    public static Type getConvertInParameterGenericType(CellConverter cellConverter){
         return ReflectionUtil.getGenericSuperType(cellConverter, 0);
     }
+
+    public static Type getConvertOutParameterGenericType(CellConverter cellConverter){
+        return ReflectionUtil.getGenericSuperType(cellConverter, 1);
+    }
+
 
     public static boolean isDefaultCellConverter(CellConverter cellConverter){
         Class<? extends CellConverter> converterClass = cellConverter.getClass();

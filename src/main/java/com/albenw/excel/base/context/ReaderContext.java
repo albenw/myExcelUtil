@@ -20,7 +20,6 @@ import java.util.List;
 @Setter
 @Slf4j
 public class ReaderContext<T> {
-    //配置属性
     private Class<T> clazz;
     private ParserTypeEnum parserType;
     private Integer sheetNum;

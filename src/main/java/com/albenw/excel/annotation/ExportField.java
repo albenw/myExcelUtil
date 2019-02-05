@@ -17,14 +17,14 @@ import java.lang.annotation.Target;
 public @interface ExportField {
 
     /**
-     * 列中文名，为空则使用字段名，导出时使用
+     * 列中文名，为空则使用字段名
      * @return
      */
     String headerName() default "";
 
     /**
      * 按照排列进行输出
-     * 注：只表示排列，不表示固定位置
+     * 注：只表示相对顺序，不代表固定位置
      * @return
      */
     int index() default 1;
@@ -36,10 +36,5 @@ public @interface ExportField {
      */
     Class<? extends CellConverter> converter() default DefaultCellConverter.class;
 
-    /**
-     * 格式：根据字段的类型进行格式化，Float／Double 保留两位小数 - "%.2f"; Data 格式化 - "yyyy-MM-dd HH:mm:ss"
-     * @return
-     */
-    String format() default "";
 
 }
