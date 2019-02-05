@@ -20,31 +20,59 @@ public class ExcelReaderTest {
     InputStream in07 = Thread.currentThread().getContextClassLoader().getResourceAsStream("excel2007.xlsx");
 
     @Test
-    public void readDomTest(){
-
-    }
-
-    @Test
-    public void read03DomTest(){
-
-    }
-
-    @Test
-    public void read07SaxTest() throws Exception {
+    public void readDomTest() throws Exception{
         ExcelReader.<User>newBuilder().targetClass(User.class).parserType(ParserTypeEnum.DOM).addListener(new ReadEventListener<User>() {
             @Override
-            public void readRow(User rowData) {
-                log.info("readRow={}", rowData);
+            public boolean readRow(User user) {
+                log.info("readRow={}", user.toString());
+                return true;
             }
 
             @Override
-            public void readBatch(List<User> rowDatas) {
-
+            public boolean readBatch(List<User> rowDatas) {
+                log.info("readBatch");
+                return true;
             }
 
             @Override
             public void readFinished() {
+                log.info("readFinished");
+            }
 
+            @Override
+            public boolean parseException(int rowNum, int colNum, User user, Exception e) {
+                log.info("user={}", user.toString());
+                log.info(e.getMessage());
+                return true;
+            }
+        }).build().read(in07);
+    }
+
+    @Test
+    public void read07SaxTest() throws Exception {
+        ExcelReader.<User>newBuilder().targetClass(User.class).parserType(ParserTypeEnum.SAX).addListener(new ReadEventListener<User>() {
+            @Override
+            public boolean readRow(User user) {
+                log.info("readRow={}", user.toString());
+                return true;
+            }
+
+            @Override
+            public boolean readBatch(List<User> rowDatas) {
+                log.info("readBatch");
+                return true;
+            }
+
+            @Override
+            public void readFinished() {
+                log.info("readFinished");
+            }
+
+            @Override
+            public boolean parseException(int rowNum, int colNum, User user, Exception e) {
+                log.info("user={}", user.toString());
+                log.info(e.getMessage());
+                return true;
             }
         }).build().read(in07);
     }

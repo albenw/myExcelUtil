@@ -1,5 +1,6 @@
 package com.albenw.excel.base.converter;
-import com.albenw.excel.exception.ConvertException;
+
+import com.albenw.excel.exception.ExcelException;
 
 /**
  * @author alben.wong
@@ -10,16 +11,16 @@ public interface CellConverter<E, F> {
     /**
      * 导入时转换
      * @return
-     * @throws ConvertException
+     * @throws ExcelException
      */
-    F convertIn(E value) throws ConvertException;
+    F convertIn(E value) throws ExcelException;
 
     /**
      * 导出时转换
      * @param value
      * @return
-     * @throws ConvertException
+     * @throws ExcelException
      */
-    E convertOut(F value) throws ConvertException;
+    E convertOut(F value) throws ExcelException;
 
 }

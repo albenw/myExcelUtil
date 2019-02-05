@@ -1,6 +1,12 @@
 package com.albenw.excel.util;
 
+import com.albenw.excel.base.IndexingField;
+import com.albenw.excel.base.converter.CellConverter;
+import com.albenw.excel.exception.ErrorCode;
+import com.albenw.excel.exception.ExcelException;
+
 import java.lang.reflect.*;
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,7 +51,6 @@ public class ReflectionUtil {
         if (!Modifier.isStatic(field.getModifiers())) {
             Objects.requireNonNull(instance, "No instance given for non-static field");
         }
-
         try {
             field.set(instance, value);
         } catch (IllegalAccessException var4) {
@@ -111,5 +116,48 @@ public class ReflectionUtil {
         }
         return result;
     }
+
+    public static Type getMethodFirstParameterGenericType(Class<?> clazz, String methodName, Class... parameterClass){
+        Method method = findMethod(clazz, methodName, parameterClass);
+        Type[] genericParameterTypes = method.getGenericParameterTypes();
+        if(genericParameterTypes == null || genericParameterTypes.length == 0){
+            return null;
+        }
+        for(Type type : genericParameterTypes){
+            if(type instanceof ParameterizedType){
+                Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
+                if(actualTypeArguments != null && actualTypeArguments.length > 0){
+                    return actualTypeArguments[0];
+                }
+            }
+        }
+        return null;
+    }
+
+    public static Type getGenericSuperType(CellConverter converter, int index){
+        Type genericSuperclass = converter.getClass().getGenericSuperclass();
+        ParameterizedType parameterized = (ParameterizedType)genericSuperclass;
+        return parameterized.getActualTypeArguments()[index];
+    }
+
+    public static Object convertToTypeValueFromString(Type type, String str) throws ParseException,  ExcelException{
+        String typeName = type.getTypeName();
+        if(Integer.class.equals(type) || "int".equals(typeName)){
+            return Integer.valueOf(str);
+        } else if(Double.class.equals(type) || "double".equals(typeName)){
+            return Double.valueOf(str);
+        } else if(Long.class.equals(type) || "long".equals(typeName)){
+            return Long.valueOf(str);
+        } else if(Float.class.equals(type) || "float".equals(typeName)){
+            return Float.valueOf(str);
+        } else if(String.class.equals(type)){
+            return str;
+        } else if(Date.class.equals(type)){
+            return DateUtil.tryParse(str);
+        } else {
+            throw new ExcelException(ErrorCode.FIELD_PARSE_ERROR, String.format("不支持类型[%s]", type.getTypeName()));
+        }
+    }
+
 
 }

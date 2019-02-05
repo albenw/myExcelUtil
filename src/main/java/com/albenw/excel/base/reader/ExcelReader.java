@@ -1,5 +1,6 @@
 package com.albenw.excel.base.reader;
 
+import com.albenw.excel.base.IndexingField;
 import com.albenw.excel.base.constant.ParserTypeEnum;
 import com.albenw.excel.base.context.ReaderContext;
 import com.albenw.excel.base.listener.ReadEventListener;
@@ -7,13 +8,16 @@ import com.albenw.excel.base.parser.DomParserWrapper;
 import com.albenw.excel.base.parser.ParserWrapper;
 import com.albenw.excel.base.parser.ReadParser;
 import com.albenw.excel.base.parser.SaxParserWrapper;
+import com.albenw.excel.exception.ErrorCode;
 import com.albenw.excel.exception.ExcelException;
-import com.albenw.excel.exception.ParseException;
+import com.albenw.excel.util.CollectionUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.Index;
 
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author alben.wong
@@ -32,8 +36,9 @@ public class ExcelReader {
         readParser.execute(in, context);
     }
 
-    private <T> ExcelReader(Class<T> targetClass, ParserTypeEnum parserType, Integer sheetNum, Integer startRow, ReadEventListener listener){
-        this.context = new ReaderContext(targetClass, parserType, sheetNum, startRow, listener);
+    private <T> ExcelReader(Class<T> targetClass, ParserTypeEnum parserType, Integer sheetNum, Integer startRow,
+                            ReadEventListener listener, Integer batchSize, List<IndexingField> fields){
+        this.context = new ReaderContext<T>(targetClass, parserType, sheetNum, startRow, listener, batchSize, fields);
         switch (parserType){
             case DOM:
                 parserWrapper = new DomParserWrapper();
@@ -42,7 +47,7 @@ public class ExcelReader {
                 parserWrapper = new SaxParserWrapper();
                 break;
             default:
-                parserWrapper = null;
+                break;
         }
     }
 
@@ -52,23 +57,24 @@ public class ExcelReader {
 
     @Setter
     @Getter
-    public static class Builder<T>{
+    public static class Builder<T> {
         private Class<T> targetClass;
         private Integer sheetNum;
         private ParserTypeEnum parserType;
         private ReadEventListener listener;
         private Integer batchSize;
         private Integer startRow;
+        private List<IndexingField> fields;
 
         public Builder<T> targetClass(Class<T> clz) {
             this.setTargetClass(clz);
             return this;
         }
 
-        public Builder<T> sheetNum(int sheetNum){
+        public Builder<T> sheetNum(int sheetNum) {
             this.setSheetNum(sheetNum);
             return this;
-        }
+              }
 
         public Builder<T> parserType(ParserTypeEnum parserType){
             this.parserType = parserType;
@@ -87,7 +93,7 @@ public class ExcelReader {
 
         public ExcelReader build() throws ExcelException {
             checkBuildParameter();
-            return new ExcelReader(this.targetClass, this.parserType, this.sheetNum, this.startRow, this.listener);
+            return new ExcelReader(this.targetClass, this.parserType, this.sheetNum, this.startRow, this.listener, this.batchSize, this.fields);
         }
 
         private void checkBuildParameter() throws ExcelException {
@@ -99,14 +105,22 @@ public class ExcelReader {
             if(this.startRow == null){
                 this.startRow = 1;
             }
-            if(targetClass == null){
-                throw new ParseException("缺少targetClass参数");
+            if(this.batchSize == null){
+                this.batchSize = 100;
             }
+            if(this.targetClass == null){
+                throw new ExcelException(ErrorCode.PARAMETER_ERROR, "缺少targetClass参数");
+            }
+            List<IndexingField> indexingFields = CollectionUtil.sortImportFieldByIndex(targetClass);
+            if(CollectionUtil.isEmpty(indexingFields)){
+                throw new ExcelException(ErrorCode.PARAMETER_ERROR, String.format("%s类缺少ImportField注解", this.targetClass.getName()));
+            }
+            this.fields = indexingFields;
             if(parserType == null){
-                throw new ParseException("缺少parserType参数");
+                throw new ExcelException(ErrorCode.PARAMETER_ERROR, "缺少parserType参数");
             }
             if(ParserTypeEnum.SAX.equals(parserType) && this.listener == null){
-                throw new ParseException("SAX模式下必须listener");
+                throw new ExcelException(ErrorCode.PARAMETER_ERROR, "SAX模式下必须listener");
             }
         }
     }

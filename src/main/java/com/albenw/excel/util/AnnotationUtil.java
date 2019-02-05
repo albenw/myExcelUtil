@@ -3,7 +3,8 @@ package com.albenw.excel.util;
 import com.albenw.excel.annotation.ExportField;
 import com.albenw.excel.annotation.ExportSheet;
 import com.albenw.excel.annotation.ImportField;
-import com.albenw.excel.exception.ParseException;
+import com.albenw.excel.exception.ErrorCode;
+import com.albenw.excel.exception.ExcelException;
 
 import java.lang.reflect.Field;
 
@@ -14,10 +15,10 @@ import java.lang.reflect.Field;
 public class AnnotationUtil {
 
 
-    public static ExportSheet getExportSheet(Class clazz) throws ParseException {
+    public static ExportSheet getExportSheet(Class clazz) throws ExcelException {
         ExportSheet anno = (ExportSheet)clazz.getAnnotation(ExportSheet.class);
         if(anno == null){
-            throw new ParseException("class -> " + clazz.getName() + ", 缺少 'ExportSheet' 注解 ");
+            throw new ExcelException(ErrorCode.LACK_OF_ANNOTATION);
         }
         return anno;
     }

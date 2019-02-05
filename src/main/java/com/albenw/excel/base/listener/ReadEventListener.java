@@ -8,10 +8,12 @@ import java.util.List;
  */
 public interface ReadEventListener<T> {
 
-    void readRow(T rowData);
+    boolean readRow(T rowData);
 
-    void readBatch(List<T> rowDatas);
+    boolean readBatch(List<T> rowDatas);
 
     void readFinished();
+
+    boolean parseException(int rowNum, int colNum, T rowData, Exception e);
 
 }

@@ -1,5 +1,6 @@
 package com.albenw.excel.annotation;
 
+import com.albenw.excel.base.converter.AbstractCellConverter;
 import com.albenw.excel.base.converter.CellConverter;
 import com.albenw.excel.base.converter.DefaultCellConverter;
 
@@ -28,6 +29,6 @@ public @interface ImportField {
      * 导入时使用 convertIn 方法进行转换
      * @return
      */
-    Class<? extends CellConverter> converter() default DefaultCellConverter.class;
+    Class<? extends AbstractCellConverter> converter() default DefaultCellConverter.class;
 
 }

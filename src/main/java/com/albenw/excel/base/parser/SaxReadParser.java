@@ -11,8 +11,7 @@ import java.io.InputStream;
 public abstract class SaxReadParser<T> implements ReadParser{
 
     @Override
-    public void execute(InputStream in, ReaderContext context) {
-
+    public void execute(InputStream in, ReaderContext context) throws Exception{
     }
 
 }

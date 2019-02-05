@@ -19,8 +19,9 @@ public class DateUtilTest {
     }
 
     @Test
-    public void parseTest(){
-        Date parse = DateUtil.parse("2019-01-31 11:17:54", DateUtil.DEFAULT_DATE_FORMAT);
+    public void TryparseTest() throws Exception{
+        Date parse = DateUtil.tryParse("2019-01-31 11:17:54");
+        log.info("parse={}", parse);
         assert parse != null;
     }
 }

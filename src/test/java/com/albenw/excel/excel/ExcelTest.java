@@ -28,18 +28,6 @@ public class ExcelTest {
     private static String FILE_2 = "";
     private static String EXCEL_TEMPLATE = "";
 
-
-    @Test
-    public void fileTest() throws Exception{
-        XSSFWorkbook toBook = new XSSFWorkbook();
-        Sheet sheet = toBook.createSheet("sheet1");
-        InputStream in = new FileInputStream(FILE_1);
-        Workbook fromBook = WorkbookFactory.create(in);
-        PoiUtil.copySheet(sheet.getWorkbook(), fromBook.getSheetAt(0), toBook.getSheetAt(0), false);
-        FileOutputStream fos = new FileOutputStream(FILE_2);
-//        ExcelUtil.getInstance().writeToStream(toBook, new BufferedOutputStream(fos));
-    }
-
     @Test
     public void exportTest() throws Exception{
         Long start = System.currentTimeMillis();

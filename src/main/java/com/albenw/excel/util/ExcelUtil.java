@@ -3,11 +3,10 @@ package com.albenw.excel.util;
 import com.albenw.excel.annotation.ExportField;
 import com.albenw.excel.annotation.ExportSheet;
 import com.albenw.excel.base.IndexingField;
-import com.albenw.util.excel.base.*;
 import com.albenw.excel.base.constant.ExcelTypeEnum;
 import com.albenw.excel.base.converter.CellConverter;
 import com.albenw.excel.base.converter.ConverterHelper;
-import com.albenw.excel.exception.ParseException;
+import com.albenw.excel.exception.ExcelException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -49,12 +48,12 @@ public final class ExcelUtil {
     public <T> void exportTo(List<T> list, OutputStream os, Class<T> clazz) throws Throwable{
         ExportSheet exportSheet = AnnotationUtil.getExportSheet(clazz);
         if(exportSheet == null){
-            throw new ParseException("缺少ExportSheet注解");
+            throw new ExcelException("缺少ExportSheet注解");
         }
         Workbook workbook = getWorkbook(exportSheet.excelFileType());
         List<IndexingField> indexingFields = CollectionUtil.sortExportFieldByIndex(clazz);
         if(CollectionUtil.isEmpty(indexingFields)){
-            throw new ParseException("没有需要导出的列");
+            throw new ExcelException("没有需要导出的列");
         }
         String sheetName = exportSheet.sheetName();
         //TODO 只导出第一个sheet
@@ -111,9 +110,9 @@ public final class ExcelUtil {
                 //进行转换
                 try{
                     CellConverter cellConverter = ConverterHelper.getCellConverter(exportColumn.converter());
-                    fieldValue = cellConverter.convertOut(fieldValue);
+                    fieldValue = cellConverter.convertOut(null);
                 }catch (Exception e){
-                    throw new ParseException(e.getMessage(), e);
+                    throw new ExcelException(e.getMessage());
                 }
                 if ("java.lang.String".equalsIgnoreCase(fieldType)) {
                     result = StringUtil.trimToEmpty((String)fieldValue);
