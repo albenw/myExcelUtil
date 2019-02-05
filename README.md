@@ -1,26 +1,76 @@
-####介绍：
-一个Excel导入导出的工具类，只需要通过定义实体类并使用提供的注解，然后调用ExcelUtil的importFrom或exportTo方法即可。
+#### 介绍
+一个excel导入、导出的工具
 
-####特点或缺点：
-* 支持按字段定义的顺序进行导入或导出，而不是使用名字对应
-* 支持对单列（字段）进行验证
-* 支持对单列（字段）进行转换
-* 支持对单行（实例）进行验证
-* XLS和XLSX
-* 支持hibernate-validator验证
+##### 导入
+1、支持 dom or sax
+2、支持 03版 and 07版
+3、支持转换，如格式转换，枚举转换
+4、支持导入时进行验证，并返回验证结果
+验证的返回分为
+（1）遇到验证失败时立刻返回
+（2）验证全部返回
+5、当是 sax 模式时天然的支持 listener 
+分为行事件监听，指定数量批次的监听，解析结束时的监听
+事件返回 boolean，可以中止解析过程
+
+例子
+```
+ExcelReader.<User>newBuilder().targetClass(User.class).parserType(ParserTypeEnum.DOM).addListener(new ReadEventListener<User>() {
+            @Override
+            public boolean readRow(User user) {
+                log.info("readRow={}", user.toString());
+                return true;
+            }
+
+            @Override
+            public boolean readBatch(List<User> rowDatas) {
+                log.info("readBatch");
+                return true;
+            }
+
+            @Override
+            public void readFinished() {
+                log.info("readFinished");
+            }
+
+            @Override
+            public boolean parseException(int rowNum, int colNum, User user, Exception e) {
+                log.info("user={}", user.toString());
+                log.info(e.getMessage());
+                return true;
+            }
+        }).build().read(in07);
+```
 
 
-####注解用法：
-* ExportSheet
-    > 导出时使用，作用关于实体类
-* ExportColumn
-    > 导出时使用，作用于字段
-* ImportSheet
-    > 导入时使用，作用关于实体类
-* ImportColumn
-    > 导入时使用，作用于字段
-    
-####TO DO:
-1.导出时增加模板的格式/样式
+##### 导出
+1、支持xls，xlsx
 
-2.效率优化
+例子
+```
+ExcelWriter excelWriter = ExcelWriter
+                .<User>newBuilder()
+                .sheetName("123")
+                .fileName("123")
+                .targetClass(User.class)
+                .excelType(ExcelTypeEnum.XLSX)
+                .outputStream(outputStream)
+                .build();
+
+        LinkedList<User> list = new LinkedList<>();
+        User user = new User();
+        user.setName("name");
+        user.setPhoneNo("phone");
+        user.setAddress("address");
+        user.setEmail("123@qq.com");
+        user.setAge(1);
+        user.setGender(1);
+        user.setAsset(100.56D);
+        user.setBirthday(new Date());
+        list.add(user);
+        excelWriter.write(list);
+
+
+```
+
+
