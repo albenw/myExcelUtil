@@ -2,20 +2,23 @@
 一个excel导入、导出的工具
 
 ##### 导入
-1、支持 dom or sax
-2、支持 03版 and 07版
-3、支持转换，如格式转换，枚举转换
-4、支持导入时进行验证，并返回验证结果
-验证的返回分为
-（1）遇到验证失败时立刻返回
-（2）验证全部返回
+1.支持 dom or sax  
+2.支持 03版 and 07版  
+3.支持转换，如格式转换，枚举转换  
+4.支持导入时进行验证，并返回验证结果  
+验证的返回分为  
+（1）遇到验证失败时立刻返回  
+（2）验证全部返回  
 5、当是 sax 模式时天然的支持 listener 
 分为行事件监听，指定数量批次的监听，解析结束时的监听
 事件返回 boolean，可以中止解析过程
 
 例子
 ```
-ExcelReader.<User>newBuilder().targetClass(User.class).parserType(ParserTypeEnum.DOM).addListener(new ReadEventListener<User>() {
+ExcelReader.<User>newBuilder()
+        .targetClass(User.class)
+        .parserType(ParserTypeEnum.DOM)
+        .addListener(new ReadEventListener<User>() {
             @Override
             public boolean readRow(User user) {
                 log.info("readRow={}", user.toString());
