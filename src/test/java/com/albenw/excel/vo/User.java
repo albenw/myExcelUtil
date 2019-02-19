@@ -14,8 +14,7 @@ import java.util.Date;
  * @author alben.wong
  * @date 2017/10/20.
  */
-@Getter @Setter
-@ToString
+@Getter @Setter @ToString
 public class User {
 
     @ExportField(index = 1, headerName = "名字")
